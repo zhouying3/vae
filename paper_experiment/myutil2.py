@@ -155,9 +155,11 @@ def random_walk(z,gene_size):
     return np.array(z_sample)
 
 def app(positive,negative,gene=[]):
+    print(positive.shape,gene.shape)
     if gene!=[]:
-        positive = np.row_stack([positive,gene])
+        positive = np.concatenate((positive,gene),axis=0)    
     a = np.ones(positive.shape[0])
+    print(positive.shape)
     b = np.zeros(negative.shape[0])        
     return np.row_stack((positive,negative)),np.append(a,b)
 
@@ -222,7 +224,7 @@ def cross_validation(data,label,para_c,para_o):
     ggmean = []
     gauc = []
     path = 'collection.xls'
-    from vae4 import mnist_vae
+    from vae6 import mnist_vae
     from sklearn.model_selection import StratifiedKFold
     skf = StratifiedKFold(n_splits = kfold)
     for train_index,test_index in skf.split(data,label):
@@ -384,3 +386,9 @@ def show2():
     plt.legend()
     plt.show()
     return
+#将数据集中的连续和离散型feature分开，根据出现的feature数据类型和频次
+def seperate(data):
+    seper = []
+    for i in range(data.shape[1]):
+        seper.append(len(set(data[i])))
+    return seper

@@ -127,5 +127,5 @@ def mnist_vae(data,gene_size,feed_dict):
 #        z_sample = np.random.randn(gene_size,latent_dim)
 #        x_hat_1_1 = sess.run([x_hat_1],feed_dict = {input_z:z_sample})
 #    return {x_hat_1[0],x_hat_1_1[0]}
-    return x_hat_1,z_sample
+    return x_hat_1
 #    return x_train_generator

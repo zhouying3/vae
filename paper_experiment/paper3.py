@@ -18,13 +18,14 @@ from myutil2 import Smote,app,compute,write,random_walk,cross_validation,grid_se
 
 #ionosphere yeast glass
 #data=np.loadtxt('./MNIST_data/ionosphere.txt',dtype='float32')
-mydata = scipy.io.loadmat('F:\\OneDrive\\mytensorflow\\MNIST_data\\UCI\\ionosphere.mat')
+mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\ionosphere.mat')
 data = np.array(mydata['data'])
 label = np.transpose(mydata['label'])
 #label = np.array(mydata['label'])
 label = label[0]
 # Parameters for reconstruction model
-para_r = {'learning_rate':0.001,
+para_r = {
+        'learning_rate':0.001,
         'training_epochs':30,
         'batch_size':20,
         'keep_rate':0.75,
@@ -35,7 +36,8 @@ para_r = {'learning_rate':0.001,
         'the':1.1
         }
 # parameters for the oversampling process
-para_o = {'hidden_encoder_dim':20, 
+para_o = {
+    'hidden_encoder_dim':20, 
     'hidden_decoder_dim':20, 
     'latent_dim':5,
     'lam':0.0001,
