@@ -353,7 +353,7 @@ def show():
     from matplotlib import pyplot as plt
     import scipy.io
 
-    mydata = scipy.io.loadmat('F:\\OneDrive\\mytensorflow\\MNIST_data\\UCI\\wpbc.mat')
+    mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\wpbc.mat')
     data = np.array(mydata['data'])
 
     for i in range(data.shape[1]):

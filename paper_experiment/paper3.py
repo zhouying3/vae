@@ -18,7 +18,7 @@ from myutil2 import Smote,app,compute,write,random_walk,cross_validation,grid_se
 
 #ionosphere yeast glass
 #data=np.loadtxt('./MNIST_data/ionosphere.txt',dtype='float32')
-mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\ionosphere.mat')
+mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\german.mat')
 data = np.array(mydata['data'])
 label = np.transpose(mydata['label'])
 #label = np.array(mydata['label'])
@@ -71,7 +71,7 @@ while (i<0):
 #random_walk = False
 i = 0
 while (i<1):
-    para_c = {'classifier':'GaussianNB','over_sampling':'vae','kfold':2}
+    para_c = {'classifier':'GaussianNB','over_sampling':'vae','kfold':kfold}
     para_o['ran_walk']=False
     cross_validation(data,label,para_c,para_o)
     i = i+1

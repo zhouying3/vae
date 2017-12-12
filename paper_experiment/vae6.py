@@ -23,4 +23,5 @@ def mnist_vae(data,gene_size,feed_dict):
     		tmp = data[com,index]
     		pre.append(tmp)
     pre = np.array(pre)
+    print('we are using vae 6')
     return pre.transpose()
