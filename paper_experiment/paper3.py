@@ -18,7 +18,7 @@ from myutil2 import Smote,app,compute,write,random_walk,cross_validation,grid_se
 
 #ionosphere yeast glass
 #data=np.loadtxt('./MNIST_data/ionosphere.txt',dtype='float32')
-mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\german.mat')
+mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\ionosphere.mat')
 data = np.array(mydata['data'])
 label = np.transpose(mydata['label'])
 #label = np.array(mydata['label'])
@@ -26,7 +26,7 @@ label = label[0]
 # Parameters for reconstruction model
 para_r = {
         'learning_rate':0.001,
-        'training_epochs':30,
+        'training_epochs':20,
         'batch_size':20,
         'keep_rate':0.75,
         'n_input':data.shape[1],
@@ -44,7 +44,8 @@ para_o = {
     'epochs':25,
     'batch_size':2,
     'learning_rate':0.001,
-    'ran_walk':True,
+    'ran_walk':False,
+    'check':True,
     'trade_off':0.5   
         }
 
@@ -70,12 +71,21 @@ while (i<0):
     i = i+1    
 #random_walk = False
 i = 0
-while (i<1):
+while (i<0):
     para_c = {'classifier':'GaussianNB','over_sampling':'vae','kfold':kfold}
     para_o['ran_walk']=False
     cross_validation(data,label,para_c,para_o)
     i = i+1
 
+from vae6 import mnist_vae
+import pandas as pd
+epochs = [10,20,30,40,50,60,70,80]
+for value in epochs:
+    para_o['epochs']=value
+    ans = mnist_vae(data,300,para_o)
+    print('trainingepoch:',value)
+    check = pd.value_counts(ans[1])
+    print(check.shape)
 #para_c = {'classifier':'GaussianNB','over_sampling':'vae','kfold':2}    
 #grid_search(data,label,para_c,para_o)
 #use the reconstruction model and generated samples

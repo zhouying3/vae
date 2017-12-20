@@ -155,7 +155,7 @@ def random_walk(z,gene_size):
     return np.array(z_sample)
 
 def app(positive,negative,gene=[]):
-    print(positive.shape,gene.shape)
+#    print(positive.shape,gene.shape)
     if gene!=[]:
         positive = np.concatenate((positive,gene),axis=0)    
     a = np.ones(positive.shape[0])
@@ -245,6 +245,7 @@ def cross_validation(data,label,para_c,para_o):
         elif para_c['over_sampling'] == 'vae':
             gene_size = positive.shape[0]
             gene = mnist_vae(positive,gene_size,para_o)
+            print(gene.shape)
         elif para_c['over_sampling'] == 'random_walk':
             gene_size = positive.shape[0]
             gene = random_walk(positive,gene_size)
@@ -253,6 +254,7 @@ def cross_validation(data,label,para_c,para_o):
         train,train_label = app(positive,negative,gene)
         y_predne = gnb.fit(train,train_label).predict(test)
         temf,temg,tema = compute(test_label,y_predne)
+        print('F1',temf,'AUC',tema,'gmean',temg)
         gF1.append(temf)
         ggmean.append(temg)
         gauc.append(tema)
@@ -392,3 +394,19 @@ def seperate(data):
     for i in range(data.shape[1]):
         seper.append(len(set(data[i])))
     return seper
+
+#对某个样本，找到其最近邻，给出样本序列号、最近距离、最近邻序列号
+def find_neigh(data,label):
+    from sklearn.model_selection import KFold
+    import csv
+    skf = KFold(n_splits = data.shape[0])
+    for train_index,test_index in skf.split(data,label):
+        neigh = NearestNeighbors(n_neighbors=1)
+        neigh.fit(data[train_index])
+        with open('find_neigh.csv','a') as f:
+            writer = csv.writer(f)        
+            a,b = neigh.kneighbors(data[test_index])
+            writer.writerow([test_index[0],a[0][0],b[0][0]])        
+    writer.writerow('finished!')
+    f.close()
+    return 

@@ -1,5 +1,6 @@
 def mnist_vae(data,gene_size,feed_dict):
     import numpy as np
+    import pandas as pd
     from vae4 import mnist_vae
     seper = []
     for i in range(data.shape[1]):
@@ -8,6 +9,7 @@ def mnist_vae(data,gene_size,feed_dict):
     #    print(seper)
     #    mask.transpose()
     continuous = data[:,mask]
+    print(continuous.shape)
     x_hat_1 = mnist_vae(continuous,gene_size,feed_dict)
     from sklearn.neighbors import KNeighborsClassifier 
     neigh = KNeighborsClassifier(n_neighbors=1)
@@ -22,6 +24,10 @@ def mnist_vae(data,gene_size,feed_dict):
     	else:
     		tmp = data[com,index]
     		pre.append(tmp)
-    pre = np.array(pre)
+    
     print('we are using vae 6')
-    return pre.transpose()
+    print('this time we are generating')
+#    print(pd.value_counts(com))
+    pre = np.array(pre)
+    print(pre.shape)
+    return pre.transpose(),com

@@ -103,7 +103,7 @@ def mnist_vae(data,gene_size,feed_dict):
     with tf.Session() as sess:
         total = int(data.shape[0]/batch_size)
         sess.run(tf.global_variables_initializer())
-        writer = tf.summary.FileWriter('.\\events\\',sess.graph)
+#        writer = tf.summary.FileWriter('.\\events\\',sess.graph)
         for i in range(epochs):
             for j in range(total):
 #                _,train = sess.run([train_step,merged], feed_dict={x: mnist.next_batch(batch_size)[0]})
@@ -112,20 +112,19 @@ def mnist_vae(data,gene_size,feed_dict):
 #                if j % 5 == 0:
 #                    print("Step {0} | Loss: {1}".format((i*total+j), cur_loss))
 #                    print("Step {0} | kld: {1}".format((i*total+j), cur_kld))
-        if ran_walk == True:
+        if feed_dict['check'] == True:
+            z_sample = sess.run(z,feed_dict={x:data})
+        elif ran_walk == True:
             zz = sess.run([z],feed_dict={x:data})#
 #        print(zz.shape)
             z_sample = random_walk(zz,gene_size)
         else:
-            miu,sigma=sess.run([mu_encoder,std_encoder],feed_dict={x:data})
-            miu = np.mean(miu,axis=0)
-            sigma = np.mean(sigma,axis=0)
-            ep = np.random.randn(gene_size,latent_dim)
-            z_sample = miu+sigma*ep
+#            miu,sigma=sess.run([mu_encoder,std_encoder],feed_dict={x:data})
+#            miu = np.mean(miu,axis=0)
+#            sigma = np.mean(sigma,axis=0)
+#            ep = np.random.randn(gene_size,latent_dim)
+#            z_sample = miu+sigma*ep
+            z_sample = np.random.normal(size=[gene_size,latent_dim])
         x_hat_1 = sess.run(x_hat_1,feed_dict = {input_z:z_sample})
-        writer.close()
-#        z_sample = np.random.randn(gene_size,latent_dim)
-#        x_hat_1_1 = sess.run([x_hat_1],feed_dict = {input_z:z_sample})
-#    return {x_hat_1[0],x_hat_1_1[0]}
+#        writer.close()
     return x_hat_1
-#    return x_train_generator
