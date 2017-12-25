@@ -245,7 +245,7 @@ def cross_validation(data,label,para_c,para_o):
         elif para_c['over_sampling'] == 'vae':
             gene_size = positive.shape[0]
             gene = mnist_vae(positive,gene_size,para_o)
-            print(gene.shape)
+#            print(gene.shape)
         elif para_c['over_sampling'] == 'random_walk':
             gene_size = positive.shape[0]
             gene = random_walk(positive,gene_size)

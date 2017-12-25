@@ -89,25 +89,34 @@ def mnist_vae(data,gene_size,feed_dict):
 #    BCE = tf.reduce_sum(tf.abs(x_hat-x))
     BCE = tf.reduce_sum(tf.pow(x_hat-x,2))
     loss = tf.reduce_mean(trade_off*BCE + KLD)
-    
+    tf.summary.scalar('unregularied_loss',loss)
+    tf.summary.scalar('lowerbound',kld)
     
     
     regularized_loss = loss + lam * l2_loss
-    tf.summary.scalar('loss',regularized_loss)
+    tf.summary.scalar('regularized_loss',regularized_loss)
 #    loss_summ = tf.summary.scalar("lowerbound", loss)
     train_step = tf.train.AdamOptimizer(learning_rate).minimize(regularized_loss)
     merged = tf.summary.merge_all()
     hidden_decoder_1 = tf.nn.relu(tf.matmul(input_z, W_decoder_z_hidden) + b_decoder_z_hidden)
     x_hat_1 = (tf.matmul(hidden_decoder_1, W_decoder_hidden_reconstruction) + b_decoder_hidden_reconstruction)
     
+    logdir = '.\\event\\'
+#    if tf.gfile.Exists(logdir):
+#        tf.gfile.DeleteRecursively(logdir)
     with tf.Session() as sess:
-        total = int(data.shape[0]/batch_size)
+        total = int(data.shape[0]/batch_size)*epochs
         sess.run(tf.global_variables_initializer())
-#        writer = tf.summary.FileWriter('.\\events\\',sess.graph)
-        for i in range(epochs):
-            for j in range(total):
+        writer = tf.summary.FileWriter(logdir,sess.graph)
+        for i in range(total):
+#            for j in range(total):
 #                _,train = sess.run([train_step,merged], feed_dict={x: mnist.next_batch(batch_size)[0]})
-                sess.run(train_step,feed_dict={x:mnist.next_batch(batch_size)[0]})
+            batch = mnist.next_batch(batch_size)[0]
+            sess.run(train_step,feed_dict={x:batch})
+            if i%10 == 0:
+                result = sess.run(merged,feed_dict={x:batch})
+                writer.add_summary(result,i)
+#                cur_loss,cur_kld = sess.run([loss,kld],feed_dict={x:batch})
 #                writer.add_summary(train)
 #                if j % 5 == 0:
 #                    print("Step {0} | Loss: {1}".format((i*total+j), cur_loss))
@@ -126,5 +135,5 @@ def mnist_vae(data,gene_size,feed_dict):
 #            z_sample = miu+sigma*ep
             z_sample = np.random.normal(size=[gene_size,latent_dim])
         x_hat_1 = sess.run(x_hat_1,feed_dict = {input_z:z_sample})
-#        writer.close()
+        writer.close()
     return x_hat_1

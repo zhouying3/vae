@@ -40,12 +40,12 @@ para_o = {
     'hidden_encoder_dim':20, 
     'hidden_decoder_dim':20, 
     'latent_dim':5,
-    'lam':0.0001,
-    'epochs':25,
-    'batch_size':2,
-    'learning_rate':0.001,
+    'lam':0,
+    'epochs':800,
+    'batch_size':10,
+    'learning_rate':0.01,
     'ran_walk':False,
-    'check':True,
+    'check':False,
     'trade_off':0.5   
         }
 
@@ -79,7 +79,8 @@ while (i<0):
 
 from vae6 import mnist_vae
 import pandas as pd
-epochs = [10,20,30,40,50,60,70,80]
+#epochs = [10,20,30,40,50,60,70,80]
+epochs = [800]
 for value in epochs:
     para_o['epochs']=value
     ans = mnist_vae(data,300,para_o)

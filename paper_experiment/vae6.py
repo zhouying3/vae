@@ -27,7 +27,8 @@ def mnist_vae(data,gene_size,feed_dict):
     
     print('we are using vae 6')
     print('this time we are generating')
-#    print(pd.value_counts(com))
+    check = pd.value_counts(com)
+    print(check.shape)
     pre = np.array(pre)
     print(pre.shape)
-    return pre.transpose(),com
+    return pre.transpose()
