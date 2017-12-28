@@ -30,5 +30,5 @@ def mnist_vae(data,gene_size,feed_dict):
     check = pd.value_counts(com)
     print(check.shape)
     pre = np.array(pre)
-    print(pre.shape)
+#    print(pre.shape)
     return pre.transpose()
