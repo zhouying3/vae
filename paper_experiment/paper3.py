@@ -80,7 +80,7 @@ while (i<0):
 
 from vae6 import mnist_vae
 #epochs = [10,20,30,40,50,60,70,80]
-epochs = [35000]
+epochs = [35]
 for value in epochs:
     para_o['epochs']=value
     ans = mnist_vae(data,300,para_o)

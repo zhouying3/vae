@@ -224,7 +224,7 @@ def cross_validation(data,label,para_c,para_o):
     ggmean = []
     gauc = []
     path = 'collection.xls'
-    from vae6 import mnist_vae
+    from vae4 import mnist_vae
     from sklearn.model_selection import StratifiedKFold
     skf = StratifiedKFold(n_splits = kfold)
     for train_index,test_index in skf.split(data,label):
