@@ -16,6 +16,7 @@ plt.subplot(312)
 for value in ans:
     plt.plot(j,value)
 plt.ylabel('predict')
+plt.ylim((0,1))
 
 plt.subplot(313)
 cha = data-ans

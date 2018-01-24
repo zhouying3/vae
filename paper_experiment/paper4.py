@@ -9,22 +9,24 @@ Created on Fri Jul  7 09:51:18 2017
 
 import numpy as np,time
 start = time.clock()
+import sklearn
 #import matplotlib.pyplot as plt
 #from sklearn import preprocessing
 #import vae
 #from SDAE import mysdae
 import scipy.io
 from myutil2 import Smote,app,compute,write,random_walk,cross_validation,grid_search
+import tensorflow as tf
 #from vae4 import mnist_vae
 
 #ionosphere yeast glass
 #data=np.loadtxt('./MNIST_data/ionosphere.txt',dtype='float32')
 #for windows
-mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\ionosphere.mat')
+mydata = scipy.io.loadmat('..\\MNIST_data\\UCI\\glass.mat')
 #for linux
 #mydata = scipy.io.loadmat('../MNIST_data/UCI/ionosphere.mat')
 data = np.array(mydata['data'])
-label = np.transpose(mydata['label'])
+label = np.transpose(mydata['label'])#
 #label = np.array(mydata['label'])
 label = label[0]
 # Parameters for reconstruction model
@@ -41,16 +43,20 @@ para_r = {
         }
 # parameters for the oversampling process
 para_o = {
-    'hidden_encoder_dim':20,                                    
-    'hidden_decoder_dim':20, 
-    'latent_dim':5,
+    'hidden_encoder_dim':10,                                    
+    'hidden_decoder_dim':10, 
+    'latent_dim':2,
     'lam':0,
-    'epochs':30000,
-    'batch_size':5,
-    'learning_rate':1e-5,
+    'epochs':500,
+    'batch_size':20,
+    'learning_rate':1e-3,
     'ran_walk':False,
-    'check':True,
-    'trade_off':0.5   
+    'check':False,
+    'trade_off':0.5,
+    'activation':tf.nn.relu,
+    'optimizer':tf.train.RMSPropOptimizer,
+    'norm':True,
+    'decay':0.9
         }
 
 kfold = 10
@@ -60,7 +66,7 @@ pos = 1
 neg = 0
 
 i = 0
-##K折交叉验证 每次跑K回
+#K折交叉验证 每次跑K回
 #while (i<1):
 #    para_c = {'classifier':'GaussianNB','over_sampling':'None','kfold':kfold}
 #    cross_validation(data,label,para_c,para_o)
@@ -73,7 +79,7 @@ i = 0
 #    para_c = {'classifier':'GaussianNB','over_sampling':'random_walk','kfold':kfold}
 #    cross_validation(data,label,para_c,para_o)
 #    i = i+1    
-#random_walk = False
+##random_walk = False
 #i = 0
 #while (i<1):
 #    para_c = {'classifier':'GaussianNB','over_sampling':'vae','kfold':kfold}
@@ -82,15 +88,82 @@ i = 0
 #    cross_validation(data,label,para_c,para_o)
 #    i = i+1
 
+from sklearn import preprocessing
+##j = 0
+##while(j<10):
+#
+from myutil2 import create_cross_validation,app2
 from vae6 import mnist_vae
-#epochs = [10,20,30,40,50,60,70,80]
-epochs = [35000]
-for value in epochs:
-    para_o['epochs']=value
-    data = data[label==1]
-    ans = mnist_vae(data,300,para_o)
-    print('trainingepoch:',value)
-    print('time used:',(time.clock()-start))
+from sklearn.preprocessing import StandardScaler
+PRE = StandardScaler
+N = 10
+positive = 1
+result = create_cross_validation([data,label],positive,N)
+generation = {}
+for i in range(N):
+    train,train_label,test,test_label = result[str(i)]
+    
+    min_max_scaler = PRE()
+    train = min_max_scaler.fit_transform(train)
+    test = min_max_scaler.transform(test)
+    result[str(i)] = train,train_label,test,test_label
+    togene = train[train_label==1]
+    _,gene = mnist_vae(togene,togene.shape[0],feed_dict=para_o)
+    generation[str(i)] = gene
+
+from get import get_result
+get_result(N,result,generation)
+
+
+#    j = j+1
+
+###利用SMOTE算法采样
+#gF1 = []
+#ggmean = []
+#gauc = []  
+#for i in range(N):
+#    train,train_label,test,test_label = result[str(i)]
+#    
+##    from sklearn.naive_bayes import GaussianNB
+##    min_max_scaler = StandardScaler()
+##    train = min_max_scaler.fit_transform(train)
+##    test = min_max_scaler.transform(test)    
+##    S = Smote(train,N=100)
+##    gene = S.over_sampling()
+#    train,_ = app2(train,generation[str(i)])
+#    train_label = np.concatenate((train_label,np.ones(gene.shape[0])),axis=0)
+#    gnb = GaussianNB()
+#    y_predne = gnb.fit(train,train_label).predict(test)
+#    y_pro = gnb.predict_proba(test)[:,1]
+#    temf,temg,tema = compute(test_label,y_predne,y_pro)
+##    print('F1',temf,'AUC',tema,'gmean',temg)    
+#    gF1.append(temf)
+#    ggmean.append(temg)
+#    gauc.append(tema)
+#print('##########################zhouying###################################')
+#print('mean F1:',np.mean(gF1),'mean AUC:',np.mean(gauc),'mean gmean:',np.mean(ggmean))
+
+
+
+#from vae6 import mnist_vae
+#from vae4 import wanna_see
+#
+##epochs = [10,20,30,40,50,60,70,80]
+#epochs = [1000]
+#for value in epochs:
+#    para_o['epochs']=value
+#    train = data[label==1]
+#    para_o['check'] = True
+#    
+##    data = preprocessing.scale(train)   
+#    min_max = PRE()
+#    
+#    data = min_max.fit_transform(train)
+##    wanna_see(train,gene,train_label)
+#    
+#    z_sample,ans = mnist_vae(data,300,para_o)
+#    print('trainingepoch:',value)
+#    print('time used:',(time.clock()-start))
 
 print('time used:',(time.clock()-start))
 #para_c = {'classifier':'GaussianNB','over_sampling':'vae','kfold':2}    
@@ -103,7 +176,7 @@ print('time used:',(time.clock()-start))
 #      {'F1':F1,'AUC':auc,'gmean':gmean})
     
     
-    
-
-
-
+#import matplotlib.pyplot as plt
+#plt.scatter(data[:,0],data[:,1],c='r')
+#plt.scatter(gene[:,0],gene[:,1],c='b')
+#plt.scatter(z_sample[:,0],z_sample[:,1],c='g')
